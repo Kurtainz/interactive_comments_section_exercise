@@ -7,20 +7,50 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
   
   <title>Frontend Mentor | Interactive comments section</title>
-
-  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
-  <style>
-    .attribution { font-size: 11px; text-align: center; }
-    .attribution a { color: hsl(228, 45%, 44%); }
-  </style>
 </head>
 <body>
 
-  <!-- Pull dynamic content from the data.json file -->
+  <!-- Comment template -->
+  <template id="commentTemplate">
+    <div class="comment">
+      <div class="profileImage">
+        <picture>
+          <source type="image/webp" srcset="">
+          <img src="" alt="Profile image">
+        </picture>
+      </div>
+      <div class="profileName">
+        <h2></h2>
+      </div>
+      <div class="postRecency">
+        <p></p>
+      </div>
+      <p class="commentText"></p>
+      <div class="ratingButtons"></div>
+      <div class="replyButton"></div>
+    </div>
+  </template>
+
+  <div id="addComment">
+    <div class="commentBox">
+      <textarea name="newComment" id="newComment" cols="30" rows="10"></textarea>
+    </div>
+    <div class="profileImage">
+      <picture>
+        <source type="image/webp" srcset="">
+        <img src="" alt="Profile image">
+      </picture>
+    </div>
+    <div class="sendButton">
+      <button>SEND</button>
+    </div>
+  </div>
   
   <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
-    Coded by <a href="#">Your Name Here</a>.
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank" rel="noreferrer">Frontend Mentor</a>. 
+    Created by <a href="https://www.github.com/kurtainz" target="_blank" rel="noreferrer">Kurt Corbett</a>.
   </div>
+
+  <script src="scripts/scripts.js"></script>
 </body>
 </html>
