@@ -1,3 +1,12 @@
+body {
+    background-color: hsl(228, 33%, 97%);
+    font-family: 'Rubik', sans-serif;
+}
+
+.comment {
+    background-color: hsl(0, 0%, 100%);
+}
+
 .attribution { 
     font-size: 11px; text-align: center; 
 }
