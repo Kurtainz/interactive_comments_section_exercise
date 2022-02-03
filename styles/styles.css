@@ -1,10 +1,92 @@
+/* Reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
 body {
     background-color: hsl(228, 33%, 97%);
     font-family: 'Rubik', sans-serif;
+    padding: 15px;
+}
+
+.flexCenter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .comment {
     background-color: hsl(0, 0%, 100%);
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.profileName {
+    color: hsl(212, 24%, 26%);
+    margin-right: 15px;
+}
+
+.profileName h2 {
+    font-size: 16px;
+}
+
+.postRecency, .commentText {
+    color: hsl(211, 10%, 45%);
+}
+
+.profileImage {
+    height: 35px;
+    width: 35px;
+    margin-right: 15px;
+}
+
+.profileImage picture * {
+    width: 35px;
+}
+
+.commentText {
+    line-height: 23px;
+    margin: 15px 0;
+}
+
+.ratingButtons {
+    background-color: hsl(228, 33%, 97%);
+    display: flex;
+    width: 100px;
+    height: 40px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.replyButton {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.replyButton img {
+    margin-right: 10px;
 }
 
 .attribution { 

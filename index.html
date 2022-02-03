@@ -18,21 +18,28 @@
   <!-- Comment template -->
   <template id="commentTemplate">
     <div class="comment">
-      <div class="profileImage">
-        <picture>
+      <div class="profileImage flexCenter">
+        <picture class="flexCenter">
           <source type="image/webp" srcset="">
           <img src="" alt="Profile image">
         </picture>
       </div>
-      <div class="profileName">
+      <div class="profileName flexCenter">
         <h2></h2>
       </div>
-      <div class="postRecency">
+      <div class="postRecency flexCenter">
         <p></p>
       </div>
       <p class="commentText"></p>
-      <div class="ratingButtons"></div>
-      <div class="replyButton"></div>
+      <div class="ratingButtons">
+        <img src="images/icon-plus.svg" alt="Plus Icon">
+        <p class="rating"></p>
+        <img src="images/icon-minus.svg" alt="Minus Icon">
+      </div>
+      <div class="replyButton">
+        <img src="images/icon-reply.svg" alt="">
+        <p>Reply</p>
+      </div>
     </div>
   </template>
 
