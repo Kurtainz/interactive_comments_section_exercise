@@ -99,11 +99,24 @@ body {
     height: 40px;
     border-radius: 10px;
     align-items: center;
-    justify-content: space-evenly;
+}
+
+.ratingButtons > * {
+    width: 33.33%;
+    height: 100%;
+}
+
+.ratingButtons img {
+    align-self: center;
 }
 
 .rating {
     color: hsl(238, 40%, 52%);
+    text-align: center;
+}
+
+.replyButton, .deleteButton, .editButton {
+    cursor: pointer;
 }
 
 .replyButton, .deleteButton {

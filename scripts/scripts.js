@@ -16,6 +16,7 @@ const createNewComment = (commentObj, isReply) => {
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
 
     // Set comment data
+    commentTemplate.querySelector('.comment').setAttribute('data-id', commentObj.id);
     commentTemplate.querySelector('.profileImage picture source').setAttribute('srcset', commentObj.user.image.webp);
     commentTemplate.querySelector('.profileImage picture img').setAttribute('src', commentObj.user.image.png);
     commentTemplate.querySelector('.profileName h2').innerText = commentObj.user.username;
@@ -98,6 +99,18 @@ const createDateDescription = date => {
     return result;
 }
 
+const rateComment = modifier => {
+    // const comments = JSON.parse(window.localStorage.getItem('commentData'));
+    let modifierSymbol = '+';
+
+    if (modifier === 'minus') {
+        modifierSymbol = '-';
+    }
+
+    
+}
+
+// Modal functions
 const openModal = commentID => {
     const modal = document.getElementById('modal');
     
@@ -105,19 +118,13 @@ const openModal = commentID => {
     document.getElementById('deleteButton').setAttribute('data-id', commentID);
 }
 
-// TODO Create modal functions, e.g., Delete post and close modal
+const closeModal = () => document.getElementById('modal').style.display = 'none';
+
 // TODO Style modal
 // TODO Desktop styles
 // TODO Create functionality for post ratings (use localStorage)
 // TODO Create functionality for creating new posts and replies (use localStorage)
 // TODO Something about hover states? 
-
-getData().then(response => {
-    localStorage.setItem('currentUserData', JSON.stringify(response.currentUser));
-    localStorage.setItem('commentData', JSON.stringify(response.comments));
-    setCurrentUserProfilePics();
-    setComments();
-});
 
 const setCurrentUserProfilePics = () => {
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
@@ -156,3 +163,61 @@ const setComments = () => {
         }
     });
 }
+
+// Delete posts functions
+const deletePost = id => {
+    disablePost(id);
+    removePostFromStorage(id);
+    removePostFromDOM(id);
+}
+
+const disablePost = id => {
+    document.querySelector(`[data-id="${id}"]`).style.backgroundColor = '#e4e4e4';
+    document.querySelector(`[data-id="${id}"]`).style.cursor = 'not-allowed';
+    document.querySelectorAll(`[data-id="${id}"] a`).forEach(link => {
+        link.style.cursor = 'not-allowed';
+        link.href = 'javascript:void(0)'
+    });
+}
+
+const removePostFromStorage = id => {
+    let commentData = JSON.parse(window.localStorage.getItem('commentData'));
+
+    commentData = commentData.filter(commentObj => {
+        if (commentObj.replies.length) {
+            commentObj.replies = commentObj.replies.filter(replyObj => String(replyObj.id) !== String(id));
+        }
+
+        return commentObj.id !== id;
+    });
+
+    window.localStorage.setItem('commentData', JSON.stringify(commentData));
+}
+
+const removePostFromDOM = id => document.querySelector(`[data-id="${id}"]`).remove();
+
+if (!window.localStorage.getItem('commentData') || !window.localStorage.getItem('currentUserData')) {
+    console.log('Getting data');
+    getData().then(response => {
+        localStorage.setItem('currentUserData', JSON.stringify(response.currentUser));
+        localStorage.setItem('commentData', JSON.stringify(response.comments));
+        setCurrentUserProfilePics();
+        setComments();
+    });
+}
+else {
+    setCurrentUserProfilePics();
+    setComments();
+}
+
+// Set modal listeners
+document.getElementById('modal').addEventListener('click', closeModal);
+document.getElementById('cancelButton').addEventListener('click', closeModal);
+window.onclick = e => {
+    const modal = document.getElementById('modal');
+
+    if (e.target === modal) {
+        closeModal();
+    }
+}
+document.getElementById('deleteButton').addEventListener('click', e => deletePost(e.target.getAttribute('data-id')));
