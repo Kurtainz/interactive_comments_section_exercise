@@ -106,8 +106,13 @@ body {
     height: 100%;
 }
 
-.ratingButtons img {
+.ratingButtons svg {
     align-self: center;
+    fill: #C5C6EF;
+}
+
+.ratingButtons a:hover svg, .selected {
+    fill: hsl(238, 40%, 52%);
 }
 
 .rating {

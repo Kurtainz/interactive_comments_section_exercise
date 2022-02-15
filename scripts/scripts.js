@@ -23,6 +23,8 @@ const createNewComment = (commentObj, isReply) => {
     commentTemplate.querySelector('.postRecency p').innerText = createDateDescription(new Date(commentObj.createdAt));
     commentTemplate.querySelector('.commentText').innerText = commentObj.content;
     commentTemplate.querySelector('.rating').innerText = commentObj.score;
+    commentTemplate.querySelectorAll('.ratingButtons a')[0].setAttribute('data-id', commentObj.id);
+    commentTemplate.querySelectorAll('.ratingButtons a')[1].setAttribute('data-id', commentObj.id);
 
     if (isReply) {
         const replyToName = document.createElement('span');
@@ -99,16 +101,37 @@ const createDateDescription = date => {
     return result;
 }
 
-const rateComment = modifier => {
-    // const comments = JSON.parse(window.localStorage.getItem('commentData'));
-    let modifierSymbol = '+';
+const rateComment = (id, modifier) => {
+    let comments = JSON.parse(window.localStorage.getItem('commentData'));
 
-    if (modifier === 'minus') {
-        modifierSymbol = '-';
-    }
+    comments = changeRating(id, comments, modifier);
 
-    
+    window.localStorage.setItem('commentData', JSON.stringify(comments));
 }
+
+const changeRating = (id, commentArr, modifier) => {
+    commentArr.some(commentObj => {
+        if (String(commentObj.id) === String(id)) {
+            if (modifier === 'minus') {
+                commentObj.score--;
+            }
+            else {
+                commentObj.score++;
+            }
+
+            updateRatingNumberText(id, commentObj.score);
+
+            return true;
+        }
+        if (commentObj.replies && commentObj.replies.length) {
+            commentObj.replies = changeRating(id, commentObj.replies, modifier);
+        }
+    });
+
+    return commentArr;
+}
+
+const updateRatingNumberText = (id, score) => document.querySelector(`.comment[data-id="${id}"] .rating`).innerText = score;
 
 // Modal functions
 const openModal = commentID => {
@@ -120,11 +143,11 @@ const openModal = commentID => {
 
 const closeModal = () => document.getElementById('modal').style.display = 'none';
 
-// TODO Style modal
-// TODO Desktop styles
 // TODO Create functionality for post ratings (use localStorage)
 // TODO Create functionality for creating new posts and replies (use localStorage)
 // TODO Something about hover states? 
+// TODO Desktop styles
+// TODO Style modal
 
 const setCurrentUserProfilePics = () => {
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
@@ -209,6 +232,18 @@ else {
     setCurrentUserProfilePics();
     setComments();
 }
+
+// Rating button listeners
+document.querySelectorAll('.ratingButtons a').forEach(button => {
+    button.addEventListener('click', e => {
+        e.preventDefault();
+
+        const modifier = e.currentTarget.getAttribute('data-modifier');
+        const id = e.currentTarget.getAttribute('data-id');
+        
+        rateComment(id, modifier);
+    });
+});
 
 // Set modal listeners
 document.getElementById('modal').addEventListener('click', closeModal);
