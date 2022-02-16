@@ -1,5 +1,7 @@
 const DateDiff = require('date-diff');
 
+let topPostID = 0;
+
 const getData = async () => {
     const response = await fetch('scripts/data.json');
 
@@ -11,7 +13,7 @@ const getData = async () => {
     return response.json();
 }
 
-const createNewComment = (commentObj, isReply) => {
+const AddCommentToPage = (commentObj, isReply) => {
     const commentTemplate = document.getElementById('commentTemplate').content.cloneNode(true);
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
 
@@ -143,7 +145,6 @@ const openModal = commentID => {
 
 const closeModal = () => document.getElementById('modal').style.display = 'none';
 
-// TODO Create functionality for post ratings (use localStorage)
 // TODO Create functionality for creating new posts and replies (use localStorage)
 // TODO Something about hover states? 
 // TODO Desktop styles
@@ -161,10 +162,14 @@ const setComments = () => {
 
     comments.forEach(parentCommentObj => {
         const newCommentBox = document.getElementById('addComment');
-        const newComment = createNewComment(parentCommentObj);
+        const newComment = AddCommentToPage(parentCommentObj);
 
         // Add comment to screen
         newCommentBox.parentNode.insertBefore(newComment, newCommentBox);
+
+        if (parentCommentObj.id > topPostID) {
+            topPostID = parentCommentObj.id;
+        }
 
         // Check for nested comments (replies)
         if (parentCommentObj.replies.length) {
@@ -177,9 +182,13 @@ const setComments = () => {
             repliesContainer.append(replyLine);
 
             parentCommentObj.replies.forEach(replyObj => {
-                const commentReply = createNewComment(replyObj, true);
+                const commentReply = AddCommentToPage(replyObj, true);
 
                 repliesContainer.append(commentReply);
+
+                if (replyObj.id > topPostID) {
+                    topPostID = replyObj.id;
+                }
             });
 
             newCommentBox.parentNode.insertBefore(repliesContainer, newCommentBox);
@@ -219,6 +228,41 @@ const removePostFromStorage = id => {
 
 const removePostFromDOM = id => document.querySelector(`[data-id="${id}"]`).remove();
 
+const createNewComment = (text, replyID) => {
+    if (text.length > 300) {
+        newCommentError();
+        return;
+    }
+
+    topPostID++;
+
+    let commentData = JSON.parse(window.localStorage.getItem('commentData'));
+    const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
+    const newComment = {
+        "id": topPostID,
+        "content": text,
+        "createdAt": new Date().toISOString(),
+        "score": 0,
+        "user": {
+          "image": { 
+            "png": currentUserData.image.png,
+            "webp": currentUserData.image.webp
+          },
+          "username": currentUserData.username
+        }
+    }
+
+    if (replyID) {
+        commentData.find(obj => obj.id === replyID).replies.push(newComment);
+    }
+    else {        
+        newComment.replies = [];
+        commentData.push(newComment);
+    }
+
+    window.localStorage.setItem('commentData', JSON.stringify(commentData));
+}
+
 if (!window.localStorage.getItem('commentData') || !window.localStorage.getItem('currentUserData')) {
     console.log('Getting data');
     getData().then(response => {
@@ -235,6 +279,9 @@ else {
 
 // Rating button listeners
 document.querySelectorAll('.ratingButtons a').forEach(button => {
+    // This will be used to disable the listener function so a comment can't be rated more than once
+    const controller = new AbortController();
+
     button.addEventListener('click', e => {
         e.preventDefault();
 
@@ -242,7 +289,14 @@ document.querySelectorAll('.ratingButtons a').forEach(button => {
         const id = e.currentTarget.getAttribute('data-id');
         
         rateComment(id, modifier);
-    });
+
+        // Highlight the selected rating and prevent from redirecting
+        e.currentTarget.classList.add('selected');
+        e.currentTarget.href = 'javascript:void(0)';
+
+        // Remove listener so it can't be called again
+        controller.abort();
+    }, { signal: controller.signal });
 });
 
 // Set modal listeners
@@ -256,3 +310,10 @@ window.onclick = e => {
     }
 }
 document.getElementById('deleteButton').addEventListener('click', e => deletePost(e.target.getAttribute('data-id')));
+
+// Create new comment
+document.getElementById('sendButton').addEventListener('click', () => {
+    const commentText = document.getElementById('newComment').value;
+
+    createNewComment(commentText);
+});
