@@ -13,7 +13,7 @@ const getData = async () => {
     return response.json();
 }
 
-const AddCommentToPage = (commentObj, isReply) => {
+const createCommentMarkup = (commentObj, isReply) => {
     const commentTemplate = document.getElementById('commentTemplate').content.cloneNode(true);
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
 
@@ -162,7 +162,7 @@ const setComments = () => {
 
     comments.forEach(parentCommentObj => {
         const newCommentBox = document.getElementById('addComment');
-        const newComment = AddCommentToPage(parentCommentObj);
+        const newComment = createCommentMarkup(parentCommentObj);
 
         // Add comment to screen
         newCommentBox.parentNode.insertBefore(newComment, newCommentBox);
@@ -173,27 +173,33 @@ const setComments = () => {
 
         // Check for nested comments (replies)
         if (parentCommentObj.replies.length) {
-            const repliesContainer = document.createElement('div');
-            const replyLine = document.createElement('div');
-
-            repliesContainer.classList.add('repliesContainer');
-            replyLine.classList.add('replyLine');
-
-            repliesContainer.append(replyLine);
+            const replyContainer = createReplyContainer();
 
             parentCommentObj.replies.forEach(replyObj => {
-                const commentReply = AddCommentToPage(replyObj, true);
+                const commentReply = createCommentMarkup(replyObj, true);
 
-                repliesContainer.append(commentReply);
+                replyContainer.append(commentReply);
 
                 if (replyObj.id > topPostID) {
                     topPostID = replyObj.id;
                 }
             });
 
-            newCommentBox.parentNode.insertBefore(repliesContainer, newCommentBox);
+            newCommentBox.parentNode.insertBefore(replyContainer, newCommentBox);
         }
     });
+}
+
+const createReplyContainer = () => {
+    const repliesContainer = document.createElement('div');
+    const replyLine = document.createElement('div');
+
+    repliesContainer.classList.add('repliesContainer');
+    replyLine.classList.add('replyLine');
+
+    repliesContainer.append(replyLine);
+
+    return repliesContainer;
 }
 
 // Delete posts functions
@@ -253,7 +259,7 @@ const createNewComment = (text, replyID) => {
     }
 
     if (replyID) {
-        commentData.find(obj => obj.id === replyID).replies.push(newComment);
+        commentData.find(obj => String(obj.id) === String(replyID)).replies.push(newComment);
     }
     else {        
         newComment.replies = [];
@@ -261,7 +267,46 @@ const createNewComment = (text, replyID) => {
     }
 
     window.localStorage.setItem('commentData', JSON.stringify(commentData));
+    return newComment;
 }
+
+const createReplyBox = id => {
+    const replyBox = document.getElementById('reply').content.cloneNode(true);
+    const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
+    const replyingToElem = document.querySelector(`[data-id="${id}"]`);
+    
+
+    replyBox.querySelector('.replyBox').setAttribute('parent-id', id);
+    replyBox.querySelector('picture source').srcset = currentUserData.image.webp;
+    replyBox.querySelector('picture img').src = currentUserData.image.png;
+    replyBox.querySelector('.replySendButton button').addEventListener('click', e => {
+        const commentText = e.currentTarget.parentElement.previousElementSibling.previousElementSibling.children[0].value;
+        const newCommentObj = createNewComment(commentText, id);
+        const newCommentMarkup = createCommentMarkup(newCommentObj)
+        
+        removeReplyBox(id);
+        
+        if (replyingToElem.nextElementSibling.classList.contains('repliesContainer')) {
+            replyingToElem.nextElementSibling.append(newCommentMarkup);
+        }
+        else {
+            const replyContainer = createReplyContainer();
+
+            replyContainer.append(newCommentMarkup);
+            document.body.insertBefore(replyContainer, replyingToElem.nextElementSibling);
+        }
+    });
+
+    // Have to add it differently if it's replying to a reply
+    if (replyingToElem.classList.contains('reply')) {
+        replyingToElem.parentElement.append(replyBox);
+    }
+    else {
+        document.body.insertBefore(replyBox, replyingToElem.nextElementSibling);
+    }
+}
+
+const removeReplyBox = id => document.querySelector(`[parent-id="${id}"]`).remove();
 
 if (!window.localStorage.getItem('commentData') || !window.localStorage.getItem('currentUserData')) {
     console.log('Getting data');
@@ -313,7 +358,27 @@ document.getElementById('deleteButton').addEventListener('click', e => deletePos
 
 // Create new comment
 document.getElementById('sendButton').addEventListener('click', () => {
-    const commentText = document.getElementById('newComment').value;
+    let commentText = document.getElementById('newComment').value;
+    const newCommentObj = createNewComment(commentText);
+    const newCommentMarkup = createCommentMarkup(newCommentObj);
+    const newCommentBox = document.getElementById('addComment');
 
-    createNewComment(commentText);
+    document.body.insertBefore(newCommentMarkup, newCommentBox);
+    document.getElementById('newComment').value = '';
+});
+
+// Listeners for reply buttons
+document.querySelectorAll('.replyButton').forEach(button => {
+    const id = button.parentElement.getAttribute('data-id');
+    const controller = new AbortController();
+    
+    button.addEventListener('click', e => {
+        e.preventDefault();
+        
+        createReplyBox(id);
+
+        // Disable listener and reply button
+        e.currentTarget.href = 'javascript:void(0)';
+        controller.abort();
+    }, { signal: controller.signal });
 });

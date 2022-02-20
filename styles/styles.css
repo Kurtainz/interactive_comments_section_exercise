@@ -201,7 +201,7 @@ text-decoration: none;
 cursor: pointer;
 }
 
-#addComment {
+#addComment, .replyBox {
     display: flex;
     flex-wrap: wrap;
     padding: 15px;
