@@ -29,10 +29,8 @@ const createCommentMarkup = (commentObj, isReply) => {
     commentTemplate.querySelectorAll('.ratingButtons a')[1].setAttribute('data-id', commentObj.id);
 
     if (isReply) {
-        const replyToName = document.createElement('span');
+        const replyToName = createReplyToName(commentObj.replyingTo);
 
-        replyToName.classList.add('replyToName');
-        replyToName.innerText = `@${commentObj.replyingTo} `;
         commentTemplate.querySelector('.commentText')
         .insertBefore(replyToName, commentTemplate.querySelector('.commentText').childNodes[0]);
 
@@ -41,22 +39,8 @@ const createCommentMarkup = (commentObj, isReply) => {
 
     // If the comment was created by the current user
     if (commentObj.user.username === currentUserData.username) {
-        const youTag = document.createElement('div');
-        const innerParagraph = document.createElement('p');
-        const deleteIcon = document.createElement('a');
-        const deleteImage = document.createElement('img');
-        const deleteText = document.createElement('p');
-
-        youTag.classList.add('you', 'flexCenter');
-
-        innerParagraph.classList.add('flexCenter');
-        innerParagraph.innerText = 'you';
-
-        deleteIcon.classList.add('deleteButton');
-        deleteIcon.addEventListener('click', () => openModal(commentObj.id));
-        deleteIcon.append(deleteImage, deleteText);
-        deleteImage.src = 'images/icon-delete.svg';
-        deleteText.innerText = 'Delete';
+        const youTag = createYouTag();
+        const deleteButton = createDeleteButton(commentObj.id);
 
         // Change reply button to edit
         commentTemplate.querySelector('.replyButton').classList.add('editButton');
@@ -65,12 +49,48 @@ const createCommentMarkup = (commentObj, isReply) => {
 
         commentTemplate.querySelector('.replyButton').style.marginLeft = '0';
 
-        youTag.append(innerParagraph);
         commentTemplate.querySelector('.comment').insertBefore(youTag, commentTemplate.querySelector('.comment').children[2]);
-        commentTemplate.querySelector('.comment').insertBefore(deleteIcon, commentTemplate.querySelector('.comment').children[6]);
+        commentTemplate.querySelector('.comment').insertBefore(deleteButton, commentTemplate.querySelector('.comment').children[6]);
     }
 
     return commentTemplate;
+}
+
+const createReplyToName = name => {
+    const replyToName = document.createElement('span');
+
+    replyToName.classList.add('replyToName');
+    replyToName.innerText = `@${name} `;
+
+    return replyToName;
+}
+
+const createYouTag = () => {
+    const youTag = document.createElement('div');
+    const innerParagraph = document.createElement('p');
+    
+    youTag.classList.add('you', 'flexCenter');
+
+    innerParagraph.classList.add('flexCenter');
+    innerParagraph.innerText = 'you';
+
+    youTag.append(innerParagraph);
+
+    return youTag;
+}
+
+const createDeleteButton = id => {
+    const deleteButton = document.createElement('a');
+    const deleteImage = document.createElement('img');
+    const deleteText = document.createElement('p');
+
+    deleteButton.classList.add('deleteButton');
+    deleteButton.addEventListener('click', () => openModal(id));
+    deleteButton.append(deleteImage, deleteText);
+    deleteImage.src = 'images/icon-delete.svg';
+    deleteText.innerText = 'Delete';
+
+    return deleteButton;
 }
 
 const createDateDescription = date => {
