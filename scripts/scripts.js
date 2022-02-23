@@ -31,8 +31,7 @@ const createCommentMarkup = (commentObj, isReply) => {
     if (isReply) {
         const replyToName = createReplyToName(commentObj.replyingTo);
 
-        commentTemplate.querySelector('.commentText')
-        .insertBefore(replyToName, commentTemplate.querySelector('.commentText').childNodes[0]);
+        commentTemplate.querySelector('.commentText').insertBefore(replyToName, commentTemplate.querySelector('.commentText').childNodes[0]);
 
         commentTemplate.firstElementChild.classList.add('reply');
     }
@@ -40,17 +39,17 @@ const createCommentMarkup = (commentObj, isReply) => {
     // If the comment was created by the current user
     if (commentObj.user.username === currentUserData.username) {
         const youTag = createYouTag();
-        const deleteButton = createDeleteButton(commentObj.id);
+        const deleteButton = createCommentButton(commentObj.id, 'delete');
+        const editButton = createCommentButton(commentObj.id, 'edit');
+        const editBox = createEditBox();
 
-        // Change reply button to edit
-        commentTemplate.querySelector('.replyButton').classList.add('editButton');
-        commentTemplate.querySelector('.replyButton img').src = 'images/icon-edit.svg';
-        commentTemplate.querySelector('.replyButton p').innerText = 'Edit';
-
-        commentTemplate.querySelector('.replyButton').style.marginLeft = '0';
+        // Delete edit button
+        commentTemplate.querySelector('.replyButton').remove();
 
         commentTemplate.querySelector('.comment').insertBefore(youTag, commentTemplate.querySelector('.comment').children[2]);
-        commentTemplate.querySelector('.comment').insertBefore(deleteButton, commentTemplate.querySelector('.comment').children[6]);
+        commentTemplate.querySelector('.comment').insertBefore(editBox, commentTemplate.querySelector('.comment').children[5]);
+        commentTemplate.querySelector('.comment').insertBefore(editButton, commentTemplate.querySelector('.comment').children[7]);
+        commentTemplate.querySelector('.comment').insertBefore(deleteButton, commentTemplate.querySelector('.comment').children[7]);
     }
 
     return commentTemplate;
@@ -79,18 +78,41 @@ const createYouTag = () => {
     return youTag;
 }
 
-const createDeleteButton = id => {
-    const deleteButton = document.createElement('a');
-    const deleteImage = document.createElement('img');
-    const deleteText = document.createElement('p');
+const createCommentButton = (id, type) => {
+    const button = document.createElement('a');
+    const image = document.createElement('img');
+    const text = document.createElement('p');
+    const buttonData = {
+        'delete': {
+            'image': 'images/icon-delete.svg',
+            'eventFunction': openModal
+        },
+        'edit': {
+            'image': 'images/icon-edit.svg',
+            'eventFunction': showEditBox
+        }
+    }
 
-    deleteButton.classList.add('deleteButton');
-    deleteButton.addEventListener('click', () => openModal(id));
-    deleteButton.append(deleteImage, deleteText);
-    deleteImage.src = 'images/icon-delete.svg';
-    deleteText.innerText = 'Delete';
+    button.classList.add(`${type}Button`);
+    button.addEventListener('click', () => buttonData[type]['eventFunction'](id));
+    button.append(image, text);
+    image.src = buttonData[type]['image'];
+    text.innerText = type[0].toUpperCase() + type.substring(1);
 
-    return deleteButton;
+    return button;
+}
+
+const showEditBox = id => {
+    document.querySelector(`[data-id="${id}"] .editBox`).style.display = 'block';
+    document.querySelector(`[data-id="${id}"] .commentText`).style.display = 'none';
+}
+
+const createEditBox = id => {
+    const textBox = document.createElement('textarea');
+
+    textBox.classList.add('editBox');
+
+    return textBox;
 }
 
 const createDateDescription = date => {
@@ -246,7 +268,7 @@ const removePostFromStorage = id => {
             commentObj.replies = commentObj.replies.filter(replyObj => String(replyObj.id) !== String(id));
         }
 
-        return commentObj.id !== id;
+        return String(commentObj.id) !== String(id);
     });
 
     window.localStorage.setItem('commentData', JSON.stringify(commentData));
@@ -279,7 +301,9 @@ const createNewComment = (text, replyID) => {
     }
 
     if (replyID) {
-        commentData.find(obj => String(obj.id) === String(replyID)).replies.push(newComment);
+        const replyingToObj = commentData.find(obj => String(obj.id) === String(replyID));
+        newComment.replyingTo = replyingToObj.user.username;
+        replyingToObj.replies.push(newComment);
     }
     else {        
         newComment.replies = [];
@@ -302,7 +326,7 @@ const createReplyBox = id => {
     replyBox.querySelector('.replySendButton button').addEventListener('click', e => {
         const commentText = e.currentTarget.parentElement.previousElementSibling.previousElementSibling.children[0].value;
         const newCommentObj = createNewComment(commentText, id);
-        const newCommentMarkup = createCommentMarkup(newCommentObj)
+        const newCommentMarkup = createCommentMarkup(newCommentObj, id);
         
         removeReplyBox(id);
         

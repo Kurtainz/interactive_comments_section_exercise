@@ -89,6 +89,10 @@ body {
     width: 100%;
 }
 
+.editBox {
+    display: none;
+}
+
 .replyToName {
     color: hsl(238, 40%, 52%);
 }
@@ -122,13 +126,10 @@ body {
 }
 
 .replyButton, .deleteButton, .editButton {
-    cursor: pointer;
-}
-
-.replyButton, .deleteButton {
     display: flex;
     align-items: center;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .deleteButton {
@@ -140,11 +141,11 @@ body {
     margin-left: auto;
 }
 
-.replyButton img, .deleteButton img {
+.replyButton img, .deleteButton img, .editButton img {
     margin-right: 10px;
 }
 
-.replyButton p {
+.replyButton p, .editButton p {
     color: hsl(238, 40%, 52%);
 }
 
