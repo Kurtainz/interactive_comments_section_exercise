@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "date-diff": "^1.0.2"
+    "date-diff": "^1.0.2",
+    "sanitize-html": "^2.7.0"
   }
 }

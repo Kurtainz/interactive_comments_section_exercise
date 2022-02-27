@@ -1,4 +1,5 @@
 const DateDiff = require('date-diff');
+const sanitizeHtml = require('sanitize-html');
 
 let topPostID = 0;
 
@@ -41,15 +42,17 @@ const createCommentMarkup = (commentObj, isReply) => {
         const youTag = createYouTag();
         const deleteButton = createCommentButton(commentObj.id, 'delete');
         const editButton = createCommentButton(commentObj.id, 'edit');
-        const editBox = createEditBox();
+        const editBox = createEditBox(commentObj.content);
+        const updateButton = createUpdateButton(commentObj.id);
 
         // Delete edit button
         commentTemplate.querySelector('.replyButton').remove();
 
         commentTemplate.querySelector('.comment').insertBefore(youTag, commentTemplate.querySelector('.comment').children[2]);
         commentTemplate.querySelector('.comment').insertBefore(editBox, commentTemplate.querySelector('.comment').children[5]);
-        commentTemplate.querySelector('.comment').insertBefore(editButton, commentTemplate.querySelector('.comment').children[7]);
-        commentTemplate.querySelector('.comment').insertBefore(deleteButton, commentTemplate.querySelector('.comment').children[7]);
+        commentTemplate.querySelector('.comment').insertBefore(updateButton, commentTemplate.querySelector('.comment').children[6]);
+        commentTemplate.querySelector('.comment').insertBefore(editButton, commentTemplate.querySelector('.comment').children[8]);
+        commentTemplate.querySelector('.comment').insertBefore(deleteButton, commentTemplate.querySelector('.comment').children[8]);
     }
 
     return commentTemplate;
@@ -89,7 +92,7 @@ const createCommentButton = (id, type) => {
         },
         'edit': {
             'image': 'images/icon-edit.svg',
-            'eventFunction': showEditBox
+            'eventFunction': showHideEditElements
         }
     }
 
@@ -102,17 +105,44 @@ const createCommentButton = (id, type) => {
     return button;
 }
 
-const showEditBox = id => {
-    document.querySelector(`[data-id="${id}"] .editBox`).style.display = 'block';
-    document.querySelector(`[data-id="${id}"] .commentText`).style.display = 'none';
+const showHideEditElements = id => {
+    const editElementClassNames = [
+        'editBox',
+        'updateButton',
+        'commentText',
+        'deleteButton',
+        'editButton'
+    ];
+
+    editElementClassNames.forEach(className => {
+        const element = document.querySelector(`[data-id="${id}"] .${className}`);
+        let newDisplayProp = 'none';
+
+        if (window.getComputedStyle(element).display === 'none') {
+            newDisplayProp = 'block';
+        }
+
+        element.style.display = newDisplayProp;
+    });
 }
 
-const createEditBox = id => {
+const createEditBox = content => {
     const textBox = document.createElement('textarea');
 
     textBox.classList.add('editBox');
+    textBox.value = content;
 
     return textBox;
+}
+
+const createUpdateButton = id => {
+    const button = document.createElement('button');
+
+    button.innerText = 'UPDATE';
+    button.classList.add('updateButton');
+    button.addEventListener('click', e => updateCommentText(e.currentTarget.previousElementSibling.value, id));
+
+    return button;
 }
 
 const createDateDescription = date => {
@@ -187,7 +217,7 @@ const openModal = commentID => {
 
 const closeModal = () => document.getElementById('modal').style.display = 'none';
 
-// TODO Create functionality for creating new posts and replies (use localStorage)
+// TODO New/update comment error function
 // TODO Something about hover states? 
 // TODO Desktop styles
 // TODO Style modal
@@ -278,7 +308,7 @@ const removePostFromDOM = id => document.querySelector(`[data-id="${id}"]`).remo
 
 const createNewComment = (text, replyID) => {
     if (text.length > 300) {
-        newCommentError();
+        commentError();
         return;
     }
 
@@ -312,6 +342,56 @@ const createNewComment = (text, replyID) => {
 
     window.localStorage.setItem('commentData', JSON.stringify(commentData));
     return newComment;
+}
+
+const updateCommentText = (text, id) => {
+    if (text.length > 300) {
+        commentError();
+        return;
+    }
+
+    let commentData = JSON.parse(window.localStorage.getItem('commentData'));
+    const commentObj = findReplyFromID(id, commentData);
+
+    commentObj.content = sanitizeHtml(text, {
+        allowedTags: [],
+        allowedAttributes: []
+    });
+
+    window.localStorage.setItem('commentData', JSON.stringify(commentData));
+
+    document.querySelector(`[data-id="${id}"] .commentText`).innerText = text;
+    showHideEditElements(id);
+}
+
+const findReplyFromID = (id, commentData) => {
+    let result;
+
+    commentData.some(obj => {
+        if (String(obj.id) === String(id)) {
+            result = obj;
+            return true;
+        }
+        else {
+            const inReplyObj = obj.replies.some(replyObj => {
+                if (String(replyObj.id) === String(id)) {
+                    result = replyObj;
+                    return true;
+                }
+            });
+            if (inReplyObj) {
+                return true;
+            }
+        }
+    });
+
+    return result;
+}
+
+const commentError = () => {
+    const errorElement = document.getElementById('commentError');
+
+    errorElement.classList.add('fadeInOut');
 }
 
 const createReplyBox = id => {
@@ -404,11 +484,13 @@ document.getElementById('deleteButton').addEventListener('click', e => deletePos
 document.getElementById('sendButton').addEventListener('click', () => {
     let commentText = document.getElementById('newComment').value;
     const newCommentObj = createNewComment(commentText);
-    const newCommentMarkup = createCommentMarkup(newCommentObj);
-    const newCommentBox = document.getElementById('addComment');
-
-    document.body.insertBefore(newCommentMarkup, newCommentBox);
-    document.getElementById('newComment').value = '';
+    if (newCommentObj) {
+        const newCommentMarkup = createCommentMarkup(newCommentObj);
+        const newCommentBox = document.getElementById('addComment');
+    
+        document.body.insertBefore(newCommentMarkup, newCommentBox);
+        document.getElementById('newComment').value = '';
+    }
 });
 
 // Listeners for reply buttons
@@ -425,4 +507,11 @@ document.querySelectorAll('.replyButton').forEach(button => {
         e.currentTarget.href = 'javascript:void(0)';
         controller.abort();
     }, { signal: controller.signal });
+});
+
+// Remove animation class on error message in case it needs to be used again
+window.addEventListener('animationend', e => {
+    if (e.target.id === 'commentError') {
+        e.target.classList.remove('fadeInOut');
+    }
 });

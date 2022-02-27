@@ -228,6 +228,10 @@ cursor: pointer;
     font-family: inherit;
 }
 
+.updateButton {
+    display: none;
+}
+
 #addComment .profileImage {
     height: 48px;
 }
@@ -236,13 +240,35 @@ cursor: pointer;
     margin-left: auto;
 }
 
-#sendButton button {
+button {
     font-size: 16px;
     background-color: hsl(238, 40%, 52%);
     color: hsl(255, 100%, 100%);
     border: none;
     padding: 15px 30px;
     border-radius: 8px;
+}
+
+#commentError {
+    opacity: 0;
+    position: fixed;
+    bottom: 0;
+    height: 50px;
+    width: 100%;
+    background-color: hsl(0deg 0% 100%);
+    z-index: -5;
+    text-align: center;
+    color: hsl(358deg 84% 48%);
+}
+
+#commentError.fadeInOut {
+    animation: fadeInOut 6s linear forwards;
+    z-index: 5;
+}
+
+@keyframes fadeInOut {
+    0%,100% { opacity: 0 }
+    10%, 80% { opacity: 1 }
 }
 
 .attribution { 
