@@ -50,7 +50,7 @@ const createCommentMarkup = (commentObj, isReply) => {
 
         commentTemplate.querySelector('.comment').insertBefore(youTag, commentTemplate.querySelector('.comment').children[2]);
         commentTemplate.querySelector('.comment').insertBefore(editBox, commentTemplate.querySelector('.comment').children[5]);
-        commentTemplate.querySelector('.comment').insertBefore(updateButton, commentTemplate.querySelector('.comment').children[6]);
+        commentTemplate.querySelector('.comment').insertBefore(updateButton, commentTemplate.querySelector('.comment').children[7]);
         commentTemplate.querySelector('.comment').insertBefore(editButton, commentTemplate.querySelector('.comment').children[8]);
         commentTemplate.querySelector('.comment').insertBefore(deleteButton, commentTemplate.querySelector('.comment').children[8]);
     }
@@ -217,7 +217,7 @@ const openModal = commentID => {
 
 const closeModal = () => document.getElementById('modal').style.display = 'none';
 
-// TODO New/update comment error function
+// Auto resize textarea elements
 // TODO Something about hover states? 
 // TODO Desktop styles
 // TODO Style modal
@@ -398,7 +398,6 @@ const createReplyBox = id => {
     const replyBox = document.getElementById('reply').content.cloneNode(true);
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
     const replyingToElem = document.querySelector(`[data-id="${id}"]`);
-    
 
     replyBox.querySelector('.replyBox').setAttribute('parent-id', id);
     replyBox.querySelector('picture source').srcset = currentUserData.image.webp;
@@ -406,18 +405,20 @@ const createReplyBox = id => {
     replyBox.querySelector('.replySendButton button').addEventListener('click', e => {
         const commentText = e.currentTarget.parentElement.previousElementSibling.previousElementSibling.children[0].value;
         const newCommentObj = createNewComment(commentText, id);
-        const newCommentMarkup = createCommentMarkup(newCommentObj, id);
-        
-        removeReplyBox(id);
-        
-        if (replyingToElem.nextElementSibling.classList.contains('repliesContainer')) {
-            replyingToElem.nextElementSibling.append(newCommentMarkup);
-        }
-        else {
-            const replyContainer = createReplyContainer();
-
-            replyContainer.append(newCommentMarkup);
-            document.body.insertBefore(replyContainer, replyingToElem.nextElementSibling);
+        if (newCommentObj) {
+            const newCommentMarkup = createCommentMarkup(newCommentObj, id);
+            
+            removeReplyBox(id);
+            
+            if (replyingToElem.nextElementSibling.classList.contains('repliesContainer')) {
+                replyingToElem.nextElementSibling.append(newCommentMarkup);
+            }
+            else {
+                const replyContainer = createReplyContainer();
+    
+                replyContainer.append(newCommentMarkup);
+                document.body.insertBefore(replyContainer, replyingToElem.nextElementSibling);
+            }
         }
     });
 
