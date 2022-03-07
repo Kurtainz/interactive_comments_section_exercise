@@ -20,14 +20,16 @@ time, mark, audio, video {
 	vertical-align: baseline;
 }
 
-body * {
-    box-sizing: border-box;
-}
-
 body {
     background-color: hsl(228, 33%, 97%);
     font-family: 'Rubik', sans-serif !important;
     padding: 15px;
+}
+
+body > * {
+    box-sizing: border-box;
+    max-width: 700px;
+    margin: auto;
 }
 
 .flexCenter {
@@ -63,8 +65,7 @@ body {
 .you p {
     color: hsl(255, 100%, 100%);
     background-color: hsl(238, 40%, 52%);
-    height: 20px;
-    padding: 0 6px;
+    padding: 1px 6px 3px;
     border-radius: 2px;
     font-size: 13px;
 }
@@ -200,12 +201,23 @@ body {
 
  .modal-content p {
     margin-bottom: 20px;
+    color: hsl(211, 10%, 45%);
+    line-height: 24px;
  }
 
  .modal-content button {
     padding: 15px 20px;
     display: inline-block;
  }
+
+#cancelButton {
+    background-color: hsl(211, 10%, 45%);
+}
+
+#deleteButton {
+    background-color: hsl(358, 79%, 66%);
+    float: right;
+}
 
 .close {
     color: #aaa;
@@ -235,11 +247,12 @@ cursor: pointer;
 }
 
 textarea {
+    box-sizing: border-box;
     display: block;
     line-height: 24px;
     margin: 15px 0px;
     width: 413px;
-    border-color: hsl(223, 19%, 93%);
+    border-color: hsl(212, 24%, 26%);
     font-family: inherit;
     color: #67727e;
     font-size: inherit;
@@ -298,4 +311,96 @@ button {
 
 .attribution a { 
     color: hsl(228, 45%, 44%); 
+}
+
+@media screen and (min-width: 790px) {
+    
+    .comment {
+        padding: 25px 25px 25px 90px;
+        position: relative;
+    }
+
+    .ratingButtons {
+        order: 1;
+        position: absolute;
+        left: 25px;
+    }
+
+    .profileImage {
+        order: 2;
+    }
+
+    .profileName {
+        order: 3;
+    }
+
+    .you {
+        order: 4;
+    }
+
+    .postRecency {
+        order: 5;
+    }
+
+    .replyButton {
+        order: 6;
+    }
+
+    .deleteButton {
+        order: 6;
+    }
+
+    .editButton {
+        order: 7;
+    }
+
+    .commentText {
+        order: 8;
+        margin-bottom: 0;
+    }
+
+    .profileName, .postRecency, .replyButton, .you, .deleteButton, .editButton {
+        align-self: baseline;
+    }
+
+    .ratingButtons {
+        width: 40px;
+        height: 100px;
+        flex-direction: column;
+        margin-right: 25px;
+    }
+
+    .ratingButtons > * {
+        height: 33.33%;
+        width: 100%;
+    }
+
+    #addComment {
+        padding: 25px;
+    }
+
+    #addComment .profileImage {
+        order: 1;
+        margin-right: 25px;
+    }
+
+    #addComment .commentBox {
+        order: 2;
+        width: unset;
+        flex: 1;
+        margin-right: 25px;
+    }
+
+    #sendButton {
+        order: 3;
+    }
+
+    #addComment .profileImage picture * {
+        width: 40px;
+    }
+
+    #addComment .commentBox textarea {
+        margin: 0;
+    }
+
 }
