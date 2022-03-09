@@ -124,6 +124,11 @@ const showHideEditElements = id => {
 
         element.style.display = newDisplayProp;
     });
+
+    // Set height of textarea to match content
+    const editBox = document.querySelector(`[data-id="${id}"] .editBox`);
+
+    editBox.style.height = editBox.scrollHeight + 'px';
 }
 
 const createEditBox = content => {

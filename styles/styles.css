@@ -43,7 +43,7 @@ body > * {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 15px;
-    border-radius: 5px;
+    border-radius: 8px;
     padding: 15px;
 }
 
@@ -125,6 +125,7 @@ body > * {
 .rating {
     color: hsl(238, 40%, 52%);
     text-align: center;
+    font-weight: 500;
 }
 
 .replyButton, .deleteButton, .editButton {
@@ -236,7 +237,7 @@ cursor: pointer;
 #addComment, .replyBox {
     display: flex;
     flex-wrap: wrap;
-    padding: 15px;
+    padding: 10px 15px;
     background-color: hsl(255, 100%, 100%);
     border-radius: 5px;
     margin-bottom: 15px;
@@ -281,6 +282,11 @@ button {
     border: none;
     padding: 15px 30px;
     border-radius: 8px;
+}
+
+button:hover {
+    background-color: hsl(239, 57%, 85%);
+    cursor: pointer;
 }
 
 #commentError {
@@ -375,6 +381,47 @@ button {
         width: 100%;
     }
 
+    .replyBox {
+        flex-wrap: nowrap;
+        padding: 10px 25px;
+    }
+
+    .replyBox .profileImage {
+        order: 1;
+        height: auto;
+        display: block;
+        margin-top: 20px;
+    }
+
+    .replyBox .commentBox {
+        order: 2;
+        margin-left: 5px;
+    }
+
+    .replyBox .replySendButton {
+        order: 3;
+        margin-left: 15px;
+        margin-top: 15px;
+    }
+
+    .repliesContainer {
+        padding-left: 90px;
+    }
+
+    .replyLine {
+        left: 45px;
+    }
+
+    .editBox {
+        order: 8;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .updateButton {
+        order: 9;
+    }
+
     #addComment {
         padding: 25px;
     }
@@ -395,12 +442,35 @@ button {
         order: 3;
     }
 
-    #addComment .profileImage picture * {
+    #addComment .profileImage picture *, .replyBox .profileImage picture * {
         width: 40px;
     }
 
     #addComment .commentBox textarea {
         margin: 0;
+    }
+
+    #modal {
+        max-width: unset;
+    }
+    
+    .modal-content {
+        width: 335px;
+        padding: 30px;
+    }
+
+    .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .modal-content button {
+        padding: 15px 25px;
+    }
+
+    #deleteButton {
+        float: unset;
+        margin-left: 10px;
     }
 
 }
