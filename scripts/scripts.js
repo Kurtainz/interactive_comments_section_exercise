@@ -48,6 +48,7 @@ const createCommentMarkup = (commentObj, isReply) => {
         // Delete edit button
         commentTemplate.querySelector('.replyButton').remove();
 
+        // Add created elements
         commentTemplate.querySelector('.comment').insertBefore(youTag, commentTemplate.querySelector('.comment').children[2]);
         commentTemplate.querySelector('.comment').insertBefore(editBox, commentTemplate.querySelector('.comment').children[5]);
         commentTemplate.querySelector('.comment').insertBefore(updateButton, commentTemplate.querySelector('.comment').children[7]);
@@ -83,23 +84,26 @@ const createYouTag = () => {
 
 const createCommentButton = (id, type) => {
     const button = document.createElement('a');
-    const image = document.createElement('img');
     const text = document.createElement('p');
     const buttonData = {
         'delete': {
-            'image': 'images/icon-delete.svg',
+            'image': `<svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z" />
+            </svg>`,
             'eventFunction': openModal
         },
         'edit': {
-            'image': 'images/icon-edit.svg',
+            'image': `<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z" />
+                </svg>`,
             'eventFunction': showHideEditElements
         }
     }
 
     button.classList.add(`${type}Button`);
     button.addEventListener('click', () => buttonData[type]['eventFunction'](id));
-    button.append(image, text);
-    image.src = buttonData[type]['image'];
+    button.innerHTML = buttonData[type]['image'];
+    button.append(text);
     text.innerText = type[0].toUpperCase() + type.substring(1);
 
     return button;
@@ -221,11 +225,6 @@ const openModal = commentID => {
 }
 
 const closeModal = () => document.getElementById('modal').style.display = 'none';
-
-// Auto resize textarea elements
-// TODO Something about hover states? 
-// TODO Desktop styles
-// TODO Style modal
 
 const setCurrentUserProfilePics = () => {
     const currentUserData = JSON.parse(window.localStorage.getItem('currentUserData'));
@@ -490,6 +489,7 @@ document.getElementById('deleteButton').addEventListener('click', e => deletePos
 document.getElementById('sendButton').addEventListener('click', () => {
     let commentText = document.getElementById('newComment').value;
     const newCommentObj = createNewComment(commentText);
+    
     if (newCommentObj) {
         const newCommentMarkup = createCommentMarkup(newCommentObj);
         const newCommentBox = document.getElementById('addComment');

@@ -141,11 +141,27 @@ body > * {
     margin-right: 15px;
 }
 
+.deleteButton svg {
+    fill: hsl(358, 79%, 66%);
+}
+
 .replyButton {
     margin-left: auto;
 }
 
-.replyButton img, .deleteButton img, .editButton img {
+.replyButton:hover p, .editButton:hover p {
+    color: hsl(239, 57%, 85%);
+}
+
+.replyButton:hover svg, .editButton:hover svg {
+    fill: hsl(239, 57%, 85%);
+}
+
+.replyButton svg, .editButton svg {
+    fill: hsl(238, 40%, 52%);
+}
+
+.replyButton svg, .deleteButton svg, .editButton svg {
     margin-right: 10px;
 }
 
@@ -155,6 +171,14 @@ body > * {
 
 .deleteButton p {
     color: hsl(358, 79%, 66%);
+}
+
+.deleteButton:hover p {
+    color: hsl(357, 100%, 86%);
+}
+
+.deleteButton:hover svg {
+    fill: hsl(357, 100%, 86%);
 }
 
 .repliesContainer {
@@ -324,6 +348,11 @@ button:hover {
     .comment {
         padding: 25px 25px 25px 90px;
         position: relative;
+        margin-bottom: 20px;
+    }
+
+    .reply {
+        margin-bottom: 7px;
     }
 
     .ratingButtons {
@@ -384,6 +413,7 @@ button:hover {
     .replyBox {
         flex-wrap: nowrap;
         padding: 10px 25px;
+        margin-top: -11px;
     }
 
     .replyBox .profileImage {
@@ -406,6 +436,7 @@ button:hover {
 
     .repliesContainer {
         padding-left: 90px;
+        margin-bottom: 20px;
     }
 
     .replyLine {
